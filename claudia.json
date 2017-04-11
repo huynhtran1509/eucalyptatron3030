@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "eucalyptatron3030-executor",
+    "name": "eucalyptatron3030",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "66ca01l7jj",
+    "module": "lib/bot"
+  }
+}

@@ -1,0 +1,22 @@
+{
+	"user-id": {
+		"type": "emergency",
+		"ID": 999
+	},
+	"epoch": 1484771343.01,
+	"payload-type": "luis",
+	"facets": {},
+	"utterance": "Seek Showtimes",
+	"payload": {
+		"query": "Seek Showtime",
+		"topScoringIntent": {
+			"intent": "SeekShowtime",
+			"score": 1.0
+		},
+		"intents": [{
+			"intent": "SeekShowtime",
+			"score": 1
+		}],
+		"entities": []
+	}
+}
