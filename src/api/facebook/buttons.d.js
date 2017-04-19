@@ -1,0 +1,12 @@
+import { IButton } from '../../facebook/send';
+import { IMovieDetail, ITheatreLocation, IPerformance } from '../query';
+export declare function getMoviesButton(theatreCode: string, title?: string): IButton;
+export declare function getShowtimeButton(m: IMovieDetail, date: Date): IButton;
+export declare function getMovieDescriptionButton(m: IMovieDetail): IButton;
+export declare function getWatchYoutubeTrailerButton(url: string): IButton;
+export declare function getWatchEmbedTrailerButton(url: string, title: string): IButton;
+export declare function getMovieButtons(m: IMovieDetail, date: Date): IButton[];
+export declare function getPurchaseButton(s: IPerformance, theatreCode?: string): IButton;
+export declare function setTheatreLocationButton(loc: ITheatreLocation): IButton;
+export declare function getSettingsButton(): IButton;
+export declare function viewRegalMoviesButton(): IButton;
