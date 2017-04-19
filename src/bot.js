@@ -4,7 +4,11 @@
 // const promiseDelay = require('promise-delay');
 // const aws = require('aws-sdk');
 // const lambda = new aws.Lambda();
-import { showLocationQuickReplyButton, showQuickReplyForErrorHandling } from './api/facebook/send/quickReply';
+import { /*showLocationQuickReplyButton,*/ showQuickReplyForErrorHandling } from './api/facebook/send/quickReply';
+import { sendTextPayload } from './handlers/facebook/send';
+import { sendSingleMoviePayload, sendMoviePayload } from './api/facebook/send/movies'
+
+
 
 const lambda = require('aws-lambda-invoke');
 
@@ -21,6 +25,15 @@ const getIntentName = alexaPayload =>
     alexaPayload.request.type === 'IntentRequest' &&
     alexaPayload.request.intent &&
     alexaPayload.request.intent.name;
+    
+function sendMNLPUtterance(mnlpUtterance?: string) {
+    if (mnlpUtterance) {
+
+        return sendTextPayload(mnlpUtterance)
+    } else {
+        return false;
+    }
+}
 
 
 const api = botBuilder((message, apiRequest) => {
@@ -95,8 +108,8 @@ const api = botBuilder((message, apiRequest) => {
 
       if (mnlpData.ShowtimesFlat) {
         return Promise.all([
-          sendMNLPUtterance(senderId, mnlpData.utterance),
-          sendMoviePayload(senderId, mnlpData.ShowtimesFlat, theatreCode, new Date())
+          sendMNLPUtterance(mnlpData.context.user_id, mnlpData.utterance),
+          sendMoviePayload(mnlpData.context.user_id, mnlpData.ShowtimesFlat, theatreCode, new Date())
         ]);
       }
 
