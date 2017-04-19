@@ -1,0 +1,11 @@
+export declare const listOfGreetings: string[];
+export declare const listOfFarewells: string[];
+export declare const listOfCannotFindMovieInfoResponses: string[];
+export declare const listOfDoNotUnderstandQueryResponses: string[];
+export declare const listOfUserHitYesResponses: string[];
+export declare const listOfUserHitNoResponses: string[];
+export declare const listOfDoNotUnderstandRequestedPayloadResponses: string[];
+export declare const listOfCannotFindShowtimesResponses: string[];
+export declare const getStartedShareLocationPrompt: string;
+export declare const shareLocationDuringConversationPrompt: string;
+export declare function randomResponse(responseList: string[]): string;

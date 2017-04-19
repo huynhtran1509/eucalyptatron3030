@@ -1,17 +1,19 @@
 {
-    "extends": "airbnb-base",
-    "parser": "babel-eslint",
-    "env": {
-        "browser": false,
-        "node": true,
-        "es6": true,
-        "mocha": true
-    },
-    "plugins": [
-        "import"
-    ],
-    "rules": {
-        "comma-dangle": 0,
-        "no-console": 0
-    }
+  "extends": "airbnb-base",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": false,
+    "node": true,
+    "es6": true,
+    "mocha": true
+  },
+  "plugins": [
+    "import",
+    "flowtype-errors"
+  ],
+  "rules": {
+    "comma-dangle": 0,
+    "no-console": 0,
+    "flowtype-errors/show-errors": 2
+  }
 }
