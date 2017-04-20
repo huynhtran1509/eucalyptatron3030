@@ -1,9 +1,11 @@
-import { ILuisData } from '../../../luis/interfaces';
-import { IMessagingReceived } from '../../../../handlers/facebook/webhook-interface';
+/**
+ * @flow
+ */
+import { ILuisData } from '../../luis/interfaces';
 import { sendCatchAll } from '../send/catchall';
 import { listOfFarewells, randomResponse } from './responseContent';
 
 
-export default function handleFarewellIntent(message: IMessagingReceived, luisData: ILuisData): Promise<{}> {
-    return sendCatchAll(message, randomResponse(listOfFarewells));
+export default function handleFarewellIntent(message: any, luisData: ILuisData): Promise<{}> {
+  return sendCatchAll(message, randomResponse(listOfFarewells));
 }

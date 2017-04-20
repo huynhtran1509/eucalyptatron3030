@@ -6,9 +6,9 @@ interface IVerifyPayload {
 }
 
 export default function handler(payload: IVerifyPayload): Promise<string> {
-    if (payload.token === FB_VERIFY_TOKEN) {
-        return Promise.resolve(payload.challenge);
-    }
+  if (payload.token === FB_VERIFY_TOKEN) {
+    return Promise.resolve(payload.challenge);
+  }
 
-    return Promise.reject('Error, wrong validation token');
-};
+  return Promise.reject('Error, wrong validation token');
+}

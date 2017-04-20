@@ -1,5 +1,6 @@
-import { invoke } from '../aws/lambda';
 import { ILuisData, LuisIntentEnum } from '../luis/interfaces';
+
+import { invoke } from '../aws/lambda';
 
 export type FacebookUserID = {
     type: 'facebook';
@@ -93,21 +94,20 @@ export type MagicNlpResponse = MagicNlpLuisResponse | MagicNlpPostbackResponse;
 
 
 export default async function query(requestPayload: MagicNlpRequest) {
-        
-    try {
-        const res = await invoke<MagicNlpRequest>("ca2", requestPayload)
+  try {
+    const res = await invoke('ca2', requestPayload);
 
-        if (res.StatusCode !== 200) {
-            throw new Error("failed to query magicNLP!");
-        }
-
-        if (typeof res.Payload === "string") {
-            const data: MagicNlpResponse = JSON.parse(res.Payload);
-            return data;
-        }
-
-        throw new Error("invalid payload from magicNLP!");
-    } catch (err) {
-        throw new err
+    if (res.StatusCode !== 200) {
+      throw new Error('failed to query magicNLP!');
     }
+
+    if (typeof res.Payload === 'string') {
+      const data: MagicNlpResponse = JSON.parse(res.Payload);
+      return data;
+    }
+
+    throw new Error('invalid payload from magicNLP!');
+  } catch (err) {
+    throw new err();
+  }
 }

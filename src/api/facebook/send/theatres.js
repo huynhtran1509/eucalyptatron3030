@@ -1,7 +1,7 @@
 import { getMapImageUrl } from '../../../google/maps';
 import { send, IButton, ISendAPIRequest } from '../../../facebook/send';
 import { getMovieButtons, getPurchaseButton, setTheatreLocationButton, getMoviesButton } from '../buttons';
-import { ITheatreLocation } from '../../query';
+import { ITheatreLocation } from '../../../handlers/query';
 
 export function sendTheatreLocationPayload(userId: string, theatreLocations: ITheatreLocation[]): Promise<{}> {
     const request: ISendAPIRequest = {
