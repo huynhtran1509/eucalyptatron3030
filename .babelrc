@@ -1,11 +1,23 @@
 {
-    "presets": [
-        "flow",
-        "es2015",
-        "stage-3"
-    ],
-    "plugins": [
-        "transform-async-to-generator",
-        "transform-runtime"
+  "presets": [
+    "flow",
+    "es2015",
+    "stage-3"
+  ],
+  "plugins": [
+    "transform-async-to-generator",
+    "transform-runtime",
+    "transform-flow-strip-types",
+    [
+      "module-resolver",
+      {
+        "root": [
+          "./src"
+        ]
+      }
     ]
+  ],
+  "ignore": [
+    "src/flow-typed/**"
+  ]
 }
