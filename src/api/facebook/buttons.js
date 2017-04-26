@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+const moment = require('moment');
 
 import { IMovieDetail, IPerformance, IShowtimes, ITheatreLocation } from '../../handlers/query';
 import { find, propEq } from 'ramda';
@@ -17,12 +17,12 @@ export function getMoviesButton(theatreCode: string, title?: string): IButton {
   };
 }
 
-export function getShowtimeButton(m: IMovieDetail, date: Date): IButton {
+export function getShowtimeButton(m: IMovieDetail): IButton {
   return {
     type: 'postback',
     title: 'Get Showtimes',
     payload: JSON.stringify({
-      type: 'MOVIE_SHOWTIMES',
+      query: 'Get Showtimes',
       payload: {
         theatreCode: m.theatreCode,
         title: m.Title,
@@ -38,7 +38,7 @@ export function getMovieDescriptionButton(m: IMovieDetail): IButton {
     type: 'postback',
     title: 'Get Description',
     payload: JSON.stringify({
-      type: 'MOVIE_DESCRIPTION',
+      query: 'Get Description',
       payload: {
         theatreCode: m.theatreCode,
         title: m.Title,
@@ -52,7 +52,7 @@ export function getWatchYoutubeTrailerButton(url: string): IButton {
   return {
     type: 'web_url',
     title: 'YouTube Trailer ↗',
-    url
+    payload: url
   };
 }
 
@@ -61,7 +61,7 @@ export function getWatchEmbedTrailerButton(m: IMovieDetail): IButton {
     type: 'postback',
     title: 'Watch Trailer',
     payload: JSON.stringify({
-      type: 'WATCH_EMBED_TRAILER',
+      query: 'Watch Trailer',
       payload: {
         url: m.embedTailerUrl,
         title: m.title
@@ -103,7 +103,7 @@ export function setTheatreLocationButton(loc: ITheatreLocation) {
     type: 'postback',
     title: 'Set as default',
     payload: JSON.stringify({
-      type: 'SET_MOVIE_THEATRE',
+      query: 'Set Movie Theatre',
       payload: {
         theatreCode: loc.TheatreCode,
         theatreName: loc.Name,

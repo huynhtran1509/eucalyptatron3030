@@ -5,6 +5,9 @@ import { getMovieButtons, getPurchaseButton } from '../buttons';
 
 const moment = require('moment');
 
+const botBuilder = require('claudia-bot-builder');
+const fbTemplate = botBuilder.fbTemplate;
+
 function getMovieRuntime(movie: IMovieDetail): string {
   const duration = moment.duration(movie.Duration, 'minutes');
   const hours = duration.hours();
@@ -27,47 +30,38 @@ function closest(arr: Array<number>, closestTo: number): number {
 }
 
 
-export function sendMoviePayload(senderId: string, movies: IMovieDetail[], theatreCode: string, date: Date): Promise<{}> {
-  const request: ISendAPIRequest = {
-    recipient: { id: senderId },
-    message: {
-      attachment: {
-        type: 'template',
-        payload: {
-          template_type: 'generic',
-                    // @TODO we need a "load more" functionality.
-                    // See issue #3
-          elements: movies.map((movie) => {
-            movie.theatreCode = theatreCode;
-            return {
-              title: movie.Title,
-              image_url: find(propEq('DimensionWidth', '640'))(movie.Media).Url,
-              subtitle: `${movie.Rating}, ${movie.GenrePrimary}, ${getMovieRuntime(movie)}`,
-              buttons: getMovieButtons(movie, date),
-            };
-          }).slice(0, 9)
-        }
-      }
-    }
-  };
-  return send(request);
+export function sendMoviePayload(movies: IMovieDetail[], theatreCode: string, type: string): Promise<{}> {
+  if (type === 'facebook') {
+    const carousel = movies.slice(0, 9);
+    const generic = new fbTemplate.Generic();
+
+    return carousel.reduce((acc, val) => {
+      const buttons = getMovieButtons(val);
+      acc
+        .addBubble(val.Title, `${val.Rating}, ${val.GenrePrimary}, ${getMovieRuntime(val)}`)
+          .addImage(find(propEq('DimensionWidth', '640'))(val.Media).Url);
+      buttons.forEach(button => acc.addButton(button.title, button.payload));
+
+      return acc;
+    }, generic).get();
+  }
 }
 
-export function sendSingleMoviePayload(senderId: string, movies: IPerformance[], theatreCode: string, date: Date): Promise<{}> {
-  const request: ISendAPIRequest = {
-    recipient: { id: senderId },
-    message: {
-      attachment: {
-        type: 'template',
-        payload: {
-          template_type: 'generic',
-          elements: movies.map(performance => ({
-            title: moment(performance.BizDateShowTime).calendar(),
-            buttons: [getPurchaseButton(performance, theatreCode)]
-          })).slice(0, 9)
-        }
-      }
-    }
-  };
-  return send(request);
+export function sendSingleMoviePayload(movies: IPerformance[], theatreCode: string, type: string): Promise<{}> {
+  if (type === 'facebook') {
+    const carousel = movies.slice(0, 9);
+    console.info("CARO",carousel)
+    const generic = new fbTemplate.Generic();
+
+    return carousel.reduce((acc, val) => {
+      const button = getPurchaseButton(val, theatreCode);
+      console.info("butt", button)
+      acc
+        .addBubble( moment(val.BizDateShowTime).calendar() )
+        .addButton(button.title, button.url);
+
+      return acc;
+    }, generic).get();
+  }
+
 }
