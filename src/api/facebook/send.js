@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { FB_GRAPH_API_ROOT, FB_PAGE_ACCESS_TOKEN } from '../../config';
 
+const axios = require('axios');
 /*
 Documentation for the FB Send API:
 
@@ -115,7 +115,6 @@ interface IQuickReplyPayload {
   image_url?: string;
 }
 
-
 export interface IQuickReplyButton {
   recipient: {
     id: string;
@@ -126,9 +125,15 @@ export interface IQuickReplyButton {
   }
 }
 
+function removeNewLines(url: string): string {
+  const re = /\r?\n|\r/gi;
+  return url.replace(re, '');
+}
 
-export function send(request: ISendAPIRequest): Promise<ISendAPIResponse> {
+
+export function send(request: ISendAPIRequest): Promise<any> {
   const url = `${FB_GRAPH_API_ROOT}/me/messages`;
+
 
   return axios.post(url, request, {
     params: {
@@ -178,7 +183,7 @@ export function sendVideoPayload(userId: string, videoUrl: string): Promise<{}> 
       attachment: {
         type: 'video',
         payload: {
-          url: videoUrl
+          url: removeNewLines(videoUrl)
         }
       }
     }

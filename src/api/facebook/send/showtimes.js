@@ -1,7 +1,7 @@
 import moment from 'moment/src/moment';
 import { send, sendButtonPayload, sendTextPayload, IButton, ISendAPIRequest } from '../../../facebook/send';
 import { getMovieButtons, getMoviesButton, viewRegalMoviesButton, getPurchaseButton, setTheatreLocationButton } from '../buttons';
-import { IMovieDetail,  getMovieShowtimes, IPerformance } from '../../query';
+import { IMovieDetail,  getMovieShowtimes, IPerformance } from '../../../handlers/query';
 import { getMoviePrediction } from '../../helpers/movies';
 //import {} from /Users/jamesfishwick/Documents/regal-bot/src/api/regal/query.ts
 

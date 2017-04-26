@@ -1,7 +1,10 @@
+/**
+ * @flow
+ */
 const axios = require('axios');
 
 export function getMapImageUrl(address: string) {
-    return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(address)}&zoom=16&size=800x600&markers=color:blue%7Clabel:%7C${encodeURIComponent(address)}&key=AIzaSyAsbE-YdnEYTcLR8kAnmURwpk9qyI34B6Y`
+  return `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(address)}&zoom=16&size=800x600&markers=color:blue%7Clabel:%7C${encodeURIComponent(address)}&key=AIzaSyAsbE-YdnEYTcLR8kAnmURwpk9qyI34B6Y`;
 }
 
 interface LatLng {
@@ -16,7 +19,7 @@ interface IGeocodeAPIResponse {
             long_name: string;
             short_name: string;
             types: string[];
-        }>
+        }>,
         formatted_address: string;
         geometry: {
             bounds: {
@@ -29,18 +32,18 @@ interface IGeocodeAPIResponse {
                 northeast: LatLng;
                 southwest: LatLng;
             }
-        }
+        },
         place_id: string;
         types: string[];
     }>
 }
 
 export function getGeocode(address: string): Promise<IGeocodeAPIResponse> {
-    const requestUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
+  const requestUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-    return axios.get(requestUrl, {
-        params: { address }
-    }).then((res) => res.data).catch(response => {
-        throw new Error(JSON.stringify(response.data));
-    });
+  return axios.get(requestUrl, {
+    params: { address }
+  }).then(res => res.data).catch((response) => {
+    throw new Error(JSON.stringify(response.data));
+  });
 }

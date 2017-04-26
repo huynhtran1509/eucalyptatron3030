@@ -13,7 +13,18 @@
   ],
   "rules": {
     "comma-dangle": 0,
-    "no-console": 0,
-    "flowtype-errors/show-errors": 2
+    "flowtype-errors/show-errors": 2,
+    "no-void": 1,
+    "no-confusing-arrow": [
+      "error",
+      {
+        "allowParens": true
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "babel-module": {}
+    }
   }
 }

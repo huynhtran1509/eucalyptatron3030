@@ -1,12 +1,7 @@
 //
 // Postback handlers for any single "movie" query
 //
-
-import * as moment from 'moment';
-import { sendShowtimesPayload } from '../send/showtimes';
-import { sendTextPayload, sendVideoPayload } from '../../../facebook/send';
-import { IMovieDetail, getMovieShowtimes } from '../../query';
-import { randomResponse, listOfCannotFindShowtimesResponses } from '../intents/responseContent';
+import { sendTextPayload, sendVideoPayload } from '../../../handlers/facebook/send';
 
 //
 // postback 'MOVIE_SHOWTIMES'
@@ -28,11 +23,11 @@ interface IMovieDescription {
 }
 
 export function getMovieDescription(movieDesc: IMovieDescription): string {
-    return `${movieDesc.title}\n\n${movieDesc.description}`;
+  return `${movieDesc.title}\n\n${movieDesc.description}`;
 }
 
 export function sendMovieDescription(senderId: string, payload: IMovieDescription): Promise<{}> {
-    return sendTextPayload(senderId, getMovieDescription(payload));
+  return sendTextPayload(senderId, getMovieDescription(payload));
 }
 
 //
@@ -48,8 +43,7 @@ interface IWatchEmbedTrailerPayload {
     title: string;
 }
 
-export function sendWatchTrailer(senderId: string, payload: IWatchEmbedTrailerPayload): Promise<{}> {
-    return sendTextPayload(senderId, `Alright, fetching the trailer for ${payload.title}, just a moment...`).then(() => {
-        return sendVideoPayload(senderId, payload.url);
-    });
+export function sendWatchTrailer(senderId: string, payload: IWatchEmbedTrailerPayload):
+Promise<{}> {
+  return sendTextPayload(senderId, `Alright, fetching the trailer for ${payload.title}, just a moment...`).then(() => sendVideoPayload(senderId, payload.url));
 }

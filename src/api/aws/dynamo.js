@@ -1,8 +1,9 @@
-const AWS = require('aws-sdk');
 import { AWS_REGION } from '../../config';
 
+const AWS = require('aws-sdk');
+
 AWS.config.update({
-    region: AWS_REGION
+  region: AWS_REGION
 });
 
 const docClient = new AWS.DynamoDB.DocumentClient();
@@ -76,13 +77,13 @@ interface IGetItemResponse {
 }
 
 export function putDocument(params: IPutItemRequest): Promise<IPutItemResponse> {
-    return new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) =>
         docClient.put(params, (error, data: IPutItemResponse) =>
             error ? reject(error) : resolve(data)));
 }
 
 export function getDocument(params: IGetItemRequest): Promise<IGetItemResponse> {
-    return new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) =>
         docClient.get(params, (error, data: IGetItemResponse) =>
             error ? reject(error) : resolve(data)));
 }

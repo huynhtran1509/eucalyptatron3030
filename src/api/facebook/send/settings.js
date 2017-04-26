@@ -1,8 +1,10 @@
-import { putDocument, getDocument } from '../../../../api/aws/dynamo';
-import { sendTextPayload, sendButtonPayload } from '../../../facebook/send';
-import { getTheatreLocationsZip, getTheatreLocationsLatLng } from '../../query';
+import { getTheatreLocationsLatLng, getTheatreLocationsZip } from '../../../handlers/query';
+import { sendButtonPayload, sendTextPayload } from '../../../handlers/facebook/send';
+
+import { getDocument } from '../../../api/aws/dynamo';
 import { sendTheatreLocationPayload } from '../send/theatres';
-//import { ICityData } from '../../../../helpers/cities';
+
+// import { ICityData } from '../../../../helpers/cities';
 
 /**
  * If we're given a zip code in the settings intent, we're going to
@@ -13,15 +15,11 @@ import { sendTheatreLocationPayload } from '../send/theatres';
  * knows---needs strategy which will guide the future implementation.
  */
 export function sendSettingsZipIntent(senderId: string, zip: number) {
-    return getTheatreLocationsZip(zip).then(locations => {
-        return sendTheatreLocationPayload(senderId, locations);
-    });
+  return getTheatreLocationsZip(zip).then(locations => sendTheatreLocationPayload(senderId, locations));
 }
 
 export function sendSettingsLatLng(senderId: string, lat: number, lng: number) {
-  return getTheatreLocationsLatLng(lat, lng).then(locations => {
-    return sendTheatreLocationPayload(senderId, locations)
-  })
+  return getTheatreLocationsLatLng(lat, lng).then(locations => sendTheatreLocationPayload(senderId, locations));
 }
 
 /**
@@ -34,40 +32,40 @@ export function sendSettingsLatLng(senderId: string, lat: number, lng: number) {
 //             return sendTextPayload(senderId,
 //                                    `Unable to find theatre locations for ${city.city}, ${city.state}`);
 //         }
-// 
+//
 //         return sendTheatreLocationPayload(senderId, locations);
 //     });
 // }
 
 export function sendSettingsPayload(senderId: string) {
-    return getDocument({
-        TableName: 'regalbot',
-        Key: { senderId }
-    }).then(document => {
-        const theatreLocation = document.Item ? document.Item[`theatreLocation`] : void 0;
-        const theatreCode = document.Item ? document.Item[`theatreCode`] : void 0;
-        const theatreName = document.Item ? document.Item[`theatreName`] : void 0;
+  return getDocument({
+    TableName: 'regalbot',
+    Key: { senderId }
+  }).then((document) => {
+    const theatreLocation = document.Item ? document.Item.theatreLocation : void 0;
+    const theatreCode = document.Item ? document.Item.theatreCode : void 0;
+    const theatreName = document.Item ? document.Item.theatreName : void 0;
 
-        if (!theatreCode) {
-            return sendTextPayload(
+    if (!theatreCode) {
+      return sendTextPayload(
                 senderId,
-                `It looks like you haven't registered a default theatre yet.\n\n` +
-                `Ask me questions like "What is playing in Washington, DC?" to get started.`);
-        }
+                'It looks like you haven\'t registered a default theatre yet.\n\n' +
+                'Ask me questions like "What is playing in Washington, DC?" to get started.');
+    }
 
-        return sendButtonPayload(senderId, [
-            'Current Theatre:',
-            '',
-            theatreName,
-            theatreLocation
-        ].join('\n'), [
-            {
-                type: 'postback',
-                title: 'Change Theatre',
-                payload: JSON.stringify({
-                    type: 'REQUEST_ZIP'
-                })
-            }
-        ]);
-    });
+    return sendButtonPayload(senderId, [
+      'Current Theatre:',
+      '',
+      theatreName,
+      theatreLocation
+    ].join('\n'), [
+      {
+        type: 'postback',
+        title: 'Change Theatre',
+        payload: JSON.stringify({
+          type: 'REQUEST_ZIP'
+        })
+      }
+    ]);
+  });
 }
