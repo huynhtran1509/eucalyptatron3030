@@ -31,7 +31,7 @@ function closest(arr: Array<number>, closestTo: number): number {
 
 
 export function sendMoviePayload(movies: IMovieDetail[], theatreCode: string, type: string): Promise<{}> {
-  if (type === 'facebook') {
+  
     const carousel = movies.slice(0, 9);
     const generic = new fbTemplate.Generic();
 
@@ -44,24 +44,22 @@ export function sendMoviePayload(movies: IMovieDetail[], theatreCode: string, ty
 
       return acc;
     }, generic).get();
-  }
+
 }
 
 export function sendSingleMoviePayload(movies: IPerformance[], theatreCode: string, type: string): Promise<{}> {
-  if (type === 'facebook') {
+  
     const carousel = movies.slice(0, 9);
-    console.info("CARO",carousel)
     const generic = new fbTemplate.Generic();
 
     return carousel.reduce((acc, val) => {
       const button = getPurchaseButton(val, theatreCode);
-      console.info("butt", button)
+      console.info('butt', button);
       acc
-        .addBubble( moment(val.BizDateShowTime).calendar() )
+        .addBubble(moment(val.BizDateShowTime).calendar())
         .addButton(button.title, button.url);
 
       return acc;
     }, generic).get();
-  }
 
 }

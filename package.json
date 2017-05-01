@@ -6,9 +6,15 @@
     "lib"
   ],
   "scripts": {
+    "start": "ntl",
     "transpile": "babel src/ --out-dir lib/",
-    "create": "npm run transpile && claudia create --region us-east-1 --api-module lib/bot",
-    "update": "npm run transpile && claudia update"
+    "create": "npm run transpile && claudia create --version dev --region us-east-1 --api-module lib/bot",
+    "deploy": "npm run transpile && claudia update --version dev && claudia set-version --version production",
+    "deploy-dev": "npm run transpile && claudia update --version dev",
+    "reassign-dev": "claudia set-version --version dev",
+    "release": "claudia set-version --version production",
+    "call-dev": "claudia test-lambda --version dev",
+    "call-production": "claudia test-lambda --version production"
   },
   "standard": {
     "parser": "babel-eslint"
@@ -46,6 +52,7 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
-    "flow-bin": "^0.44.2"
+    "flow-bin": "^0.44.2",
+    "ntl": "^1.2.0"
   }
 }

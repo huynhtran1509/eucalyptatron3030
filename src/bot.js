@@ -15,7 +15,7 @@ const AlexaMessageBuilder = require('alexa-message-builder');
 
 const store = makeStore();
 store.subscribe(() =>
-  console.log('STORE', store.getState())
+  console.log('[STORE', store.getState())
 );
 
 store.dispatch({
@@ -44,28 +44,26 @@ const api = botBuilder((message: any, apiRequest) => {
   Console.error = console.error.bind(null, '[ERROR]');
   Console.warn = console.warn.bind(null, '[WARN]');
 
-  // Console.info('MSG----', message, 'API----', apiRequest);
+
 // TODO: use http://ramdajs.com/0.23.0/docs/#evolve
 // from the front end:
   const immMsg = fromJS(message);
-  Console.warn(immMsg);
-
+  const alias = apiRequest.lambdaContext.invokedFunctionArn.replace(/.*:/g, '');
   const text = immMsg.get('text'); // TODO this can be an obj, so...
   const senderId = immMsg.get('sender');
   const type = immMsg.get('type');
   const hasPostback = immMsg.get('postback');
+  let query;
 
-// TODO Test for object or for postback???
+  Console.info(`[RELEASE] executing: ${apiRequest.lambdaContext.functionName}, alias: ${alias} (version ${apiRequest.lambdaContext.functionVersion})`);
+  Console.info('[MSG]', immMsg);
 
-
-  const utterance = () => { // TODO function that constructs JSON
-    Console.warn('TEXT', text, 'TYPE', type, 'hasPostback', hasPostback);
     if (hasPostback) {
       const postback = JSON.parse(text);
-      Console.warn('peeload', postback.payload);
+      
 
       if (postback.query === 'Get Description') {
-        return { // Get Descriptioni
+         query = Map( // Get Descriptioni
           'user-id': {
             type,
             ID: senderId
@@ -93,7 +91,7 @@ const api = botBuilder((message: any, apiRequest) => {
             ],
             entities: []
           }
-        };
+        )
       } else if (postback.query === 'Get Showtimes') {
         Console.warn('GET SHOWTIMES', postback);
         const theatreCode = postback.payload.theatreCode;
@@ -106,7 +104,7 @@ const api = botBuilder((message: any, apiRequest) => {
           'ity.movie': { ...movie }
         } : {};
 
-        return {
+        query = Map (
           'user-id': {
             type: 'facebook',
             ID: senderId
@@ -129,25 +127,33 @@ const api = botBuilder((message: any, apiRequest) => {
             ],
             entities: []
           }
-        };
+        );
       }
-    }
-    return {
-      'user-id': {
-        type,
-        ID: senderId
-      },
-      utterance: text,
-      payload: {
-        query: text
-      }
-    };
-  };
+      store.dispatch({
+        type: 'SET_STATE',
+        state: query,
+      });
 
-  store.dispatch({
-    type: 'SET_STATE',
-    state: utterance(),
-  });
+    }
+    else { 
+      const query = Map(
+        'user-id': {
+          type,
+          ID: senderId
+        },
+        utterance: text,
+        payload: {
+          query: text
+        }
+      );
+      store.dispatch({
+        type: 'SET_STATE',
+        state: utterance(),
+      });
+
+    };
+
+
 
   if (message.text) { //
     return new Promise((resolve, reject) => {
@@ -163,16 +169,19 @@ const api = botBuilder((message: any, apiRequest) => {
       });
     }).then((mnlpData) => { // continunity sez
       const payload = JSON.parse(mnlpData.Payload);
+      const type = payload.context['user-id'].type;
       Console.log('mnlpData', mnlpData);
       Console.info('payload', payload);
+      Console.info('type', type);
+
 
       if (payload.errorMessage) {
-        throw new Error(mnlpData.errorMessage);
+        throw new Error(payload.errorMessage);
       }
 
       if (payload.Recovery) {
           // showQuickReplyForErrorHandling(message.sender, mnlpData.utterance);
-        return showQuickReplyForErrorHandling(message.sender, mnlpData.utterance);
+        return showQuickReplyForErrorHandling(payload.utterance);
       }
 
       // if (payload.AskLocation) {
@@ -181,36 +190,59 @@ const api = botBuilder((message: any, apiRequest) => {
       // }
 
       if (payload.ShowtimesFlat) {
+        Console.warn('ShowtimesFlat', payload.ShowtimesFlat);
+        if (type === "facebook") {
         return Promise.all([
           sendMNLPUtterance(payload.utterance),
-          sendMoviePayload(payload.ShowtimesFlat, payload.context.sessions[0].facets['ity.location']['ity.code'], payload.context['user-id'].type)
+          sendMoviePayload(payload.ShowtimesFlat, payload.context.sessions[0].facets['ity.location']['ity.code'])
         ]);
+        }
+        else if (type === "alexa-skill") {
+          return new AlexaMessageBuilder()
+            .addText(payload.utterance)
+            // .addStandardCard('Alexa Message Builder', 'Alexa message builder description', {
+            //   smallImageUrl: 'http://example.com/small-image-url.png',
+            //   largeImageUrl: 'http://example.com/large-image-url.png'
+            // })
+            .keepSession()
+            .get()
+        }
+        
+        return payload.utterance;
+      
       }
 
       if (payload.Showtimes) {
           // get performance arrays from each Showtime and flatten them
         const performances = [].concat.apply([], payload.Showtimes.map(obj => obj.Performances));
         Console.warn('PERFORMANCES', performances);
-        return Promise.all([
-          sendMNLPUtterance(payload.utterance),
-          sendSingleMoviePayload(performances, payload.context.sessions[0].facets['ity.location']['ity.code'], payload.context['user-id'].type) // TODO immutable or rambda
-        ]);
-      }
+        if (type === "facebook") {
+          return Promise.all([
+            sendMNLPUtterance(payload.utterance),
+            sendSingleMoviePayload(performances, payload.context.sessions[0].facets['ity.location']['ity.code']) // TODO immutable or rambda
+          ]);
+        }
+        else if (type === "alexa-skill") {
+          return new AlexaMessageBuilder()
+            .addText(payload.utterance)
+            // TODO iterate through movies
+            // .addStandardCard('Alexa Message Builder', 'Alexa message builder description', {
+            //   smallImageUrl: 'http://example.com/small-image-url.png',
+            //   largeImageUrl: 'http://example.com/large-image-url.png'
+            // })
+            .keepSession()
+            .get()
+        }
+        return 'All this shit';
+
+        }
       // Text messages returns a simple text. In case you don't need to add
       // quick responses reply with a simple text and Cluaudia Bot Builder will
       // do the rest.
-      if (type === 'alexa-skill') {
-        Console.warn("trying to contact alexa");
-        return new AlexaMessageBuilder()
-        .addText('hi from alexa')
-        .keepSession()
-        .get();
-      }
-
       return payload.utterance;
     }).catch((error) => {
       Console.warn(error);
-      return 'Could not setup';
+      return 'Sorry, I seem to be having some trouble finding that right now. In the meantime, why not check on our website: regmovies.com';
     });
   }
   return 'No response from AI';
